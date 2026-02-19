@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Professional Predictor Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0b0f1a; --glass:rgba(255,255,255,.06); --blur:blur(22px);
+  --gold:#facc15; --blue:#38bdf8; --green:#22c55e; --red:#ef4444;
+  --text:#e5e7eb; --muted:#9ca3af;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;font-family:Inter,sans-serif;background:radial-gradient(circle at top,#1a1f36,#0b0f1a);color:var(--text);overflow:hidden}
+.side{position:fixed;top:0;bottom:0;width:160px;backdrop-filter:var(--blur)}
+.side.left{left:0} .side.right{right:0}
+.app{position:relative;max-width:620px;margin:auto;height:100%;padding:20px;display:flex;flex-direction:column;gap:22px;overflow-y:auto}
+.card{background:var(--glass);backdrop-filter:var(--blur);border-radius:20px;padding:22px;box-shadow:0 20px 40px rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.1)}
+.center{text-align:center}
+.logo{font-family:Orbitron,sans-serif;font-size:30px;background:linear-gradient(90deg,#facc15,#fb923c);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.sub{font-size:12px;color:var(--muted);font-weight:700;letter-spacing:1px}
+.period{margin-top:14px;padding:10px;border:2px solid var(--gold);border-radius:14px;font-weight:800;font-size:20px;color:var(--gold);white-space:nowrap}
+.pred{font-size:50px;font-weight:900;margin:12px 0}
+.BIG{color:#fb923c;text-shadow:0 0 18px #fb923c}
+.SMALL{color:var(--blue);text-shadow:0 0 18px var(--blue)}
+.status{font-size:13px;color:var(--muted);font-weight:700}
+.timer{margin-top:6px;font-size:13px;font-weight:700;color:var(--gold)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:10px;text-align:center}
+th{color:var(--muted);border-bottom:1px solid rgba(255,255,255,.15)}
+td{border-bottom:1px solid rgba(255,255,255,.06)}
+.win{color:var(--green);font-weight:800}
+.loss{color:var(--red);font-weight:800}
+</style>
+</head>
+<body>
+<div class="side left"></div><div class="side right"></div>
+<div class="app">
+<div class="card center">
+  <div class="logo">PREDICTOR</div>
+  <div class="sub">LIVE CURRENT PERIOD</div>
+  <div class="period" id="livePeriod">Loading…</div>
+  <div class="pred" id="prediction">WAIT</div>
+  <div class="status" id="status">Waiting for period end</div>
+  <div class="timer">Next check: <span id="sec">60</span>s</div>
+</div>
+<div class="card">
+  <div class="center">
+    <div class="logo">HISTORY</div>
+    <div class="sub">CONFIRMED RESULTS ONLY</div>
+  </div>
+  <table>
+    <thead><tr><th>Period</th><th>Predicted</th><th>Actual</th><th>Status</th></tr></thead>
+    <tbody id="history"></tbody>
+  </table>
+</div>
+</div>
+<script>
+const API="https://draw.ar-lottery01.com/WinGo/WinGo_1M/GetHistoryIssuePage.json";
+const PERIOD_SECONDS=60;
+let currentPeriod=null,currentPrediction=null,countdown=PERIOD_SECONDS;
+const predictionStore={},historyAdded=new Set();
+function getCurrentPeriod(){return Math.floor(Date.now()/1000/PERIOD_SECONDS)}
+function ensemblePrediction(nums){
+  let s=0;
+  s+=nums.slice(0,5).filter(n=>n>=5).length>=3?1:-1;
+  s+=nums.reduce((a,b)=>a+b,0)/nums.length>4.5?-1:1;
+  const fib=[1,1,2,3,5,8];
+  nums.slice(0,6).forEach((n,i)=>s+=(n>=5?1:-1)*fib[i]);
+  s+=nums[0]>=5?0.5:-0.5;
+  s+=Math.random()-0.5;
+  return s>=0?"BIG":"SMALL";
+}
+async function updatePredictor(){
+  const p=getCurrentPeriod();
+  if(p!==currentPeriod){
+    currentPeriod=p;
+    const r=await fetch(API),j=await r.json();
+    const nums=j.data.list.map(x=>Number(x.number));
+    currentPrediction=ensemblePrediction(nums);
+    predictionStore[p]=currentPrediction;
+    livePeriod.textContent="PERIOD: "+p;
+    prediction.textContent=currentPrediction;
+    prediction.className="pred "+currentPrediction;
+    status.textContent="Prediction locked";
+    countdown=PERIOD_SECONDS;
+  }
+}
+async function updateHistory(){
+  const r=await fetch(API),j=await r.json();
+  j.data.list.forEach(it=>{
+    const ap=Number(it.issueNumber);
+    const act=Number(it.number)>=5?"BIG":"SMALL";
+    if(predictionStore[ap]&&!historyAdded.has(ap)){
+      const pred=predictionStore[ap];
+      const win=pred===act;
+      const tr=document.createElement("tr");
+      tr.innerHTML=`<td>${ap}</td><td>${pred}</td><td>${act}</td><td class="${win?'win':'loss'}">${win?'WIN':'LOSS'}</td>`;
+      history.prepend(tr); historyAdded.add(ap);
+    }
+  });
+}
+setInterval(()=>{countdown--;if(countdown<=0)countdown=PERIOD_SECONDS;sec.textContent=countdown},1000);
+setInterval(updatePredictor,3000); setInterval(updateHistory,4000); updatePredictor();
+</script>
+</body>
+</html>
