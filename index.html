@@ -2,127 +2,191 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>EVIL DAD AI</title>
+<title>EVIL DAD</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
 
+*{
+box-sizing:border-box;
+}
+
 body{
+
 margin:0;
 font-family:Arial;
-background:linear-gradient(180deg,#05060c,#0f1220);
+background:#070912;
 color:white;
+
 display:flex;
 justify-content:center;
+
 }
 
 .app{
-width:420px;
-padding:20px;
+
+width:100%;
+max-width:420px;
+padding:14px;
+
 }
 
 /* TITLE */
 
 .title{
+
 text-align:center;
 font-size:24px;
 font-weight:900;
 letter-spacing:3px;
-margin-bottom:18px;
+margin-bottom:12px;
+
 color:#ff2e63;
 text-shadow:0 0 10px #ff2e63;
+
 }
 
 /* BOX */
 
 .box{
+
 background:#121526;
-border-radius:16px;
-padding:16px;
-margin-bottom:14px;
-border:1px solid #2b3050;
-box-shadow:0 0 15px rgba(0,0,0,0.5);
+
+border-radius:14px;
+
+padding:14px;
+
+margin-bottom:12px;
+
+border:1px solid #2c3150;
+
 }
 
 /* TOP BAR */
 
 .topbar{
+
 display:flex;
+
 justify-content:space-between;
+
 font-size:13px;
-font-weight:bold;
+
 color:#9aa2d6;
+
 }
 
 /* PREDICTION */
 
-.predictionBox{
+.prediction{
+
 text-align:center;
+
 }
 
 #prediction{
-font-size:48px;
+
+font-size:44px;
+
 font-weight:900;
-margin-top:10px;
-letter-spacing:2px;
+
+margin-top:6px;
+
 }
 
 .big{
-color:#ff3b3b;
-text-shadow:0 0 10px #ff3b3b;
+
+color:#ff4d4d;
+
+text-shadow:0 0 8px #ff4d4d;
+
 }
 
 .small{
-color:#00ff9d;
-text-shadow:0 0 10px #00ff9d;
+
+color:#00ffa2;
+
+text-shadow:0 0 8px #00ffa2;
+
 }
 
 .pattern{
+
 font-size:12px;
-margin-top:8px;
-color:#9aa2d6;
+
+margin-top:6px;
+
+color:#8a90c2;
+
 }
 
 /* HISTORY */
 
 .history{
-max-height:260px;
+
+height:240px;
+
 overflow-y:auto;
+
 }
 
 table{
+
 width:100%;
+
 border-collapse:collapse;
+
 font-size:12px;
+
 }
 
 th{
-color:#8d94c5;
+
+color:#8b92c7;
+
 padding:6px;
+
 }
 
 td{
+
 padding:6px;
+
+text-align:center;
+
 }
 
 .win{
-color:#00ff9d;
+
+color:#00ffa2;
+
 font-weight:bold;
+
 }
 
 .loss{
-color:#ff3b3b;
+
+color:#ff4d4d;
+
 font-weight:bold;
+
 }
 
 /* SCROLL */
 
 .history::-webkit-scrollbar{
+
 width:4px;
+
 }
 
 .history::-webkit-scrollbar-thumb{
+
 background:#444;
+
 border-radius:10px;
+
 }
 
 </style>
@@ -135,18 +199,23 @@ border-radius:10px;
 <div class="title">EVIL DAD</div>
 
 <div class="box topbar">
-<div>Period: <span id="period">---</span></div>
-<div>Timer: <span id="timer">--</span></div>
+
+<div>Period : <span id="period">---</span></div>
+
+<div>Timer : <span id="timer">--</span></div>
+
 </div>
 
-<div class="box predictionBox">
+<div class="box prediction">
 
 <div style="font-size:12px;color:#9aa2d6">NEXT OUTCOME</div>
 
 <div id="prediction">WAIT</div>
 
 <div class="pattern">
-Pattern Used : <span id="pattern">---</span>
+
+Pattern : <span id="pattern">---</span>
+
 </div>
 
 </div>
@@ -156,12 +225,16 @@ Pattern Used : <span id="pattern">---</span>
 <table>
 
 <thead>
+
 <tr>
+
 <th>PERIOD</th>
 <th>PRED</th>
 <th>NUM</th>
 <th>RESULT</th>
+
 </tr>
+
 </thead>
 
 <tbody id="history"></tbody>
@@ -177,6 +250,7 @@ Pattern Used : <span id="pattern">---</span>
 const API="https://draw.ar-lottery01.com/WinGo/WinGo_1M/GetHistoryIssuePage.json";
 
 let savedPrediction=null;
+
 let lastPeriod=null;
 
 /* TIMER */
@@ -188,35 +262,43 @@ setInterval(()=>{
 let now=new Date();
 
 let sec=now.getUTCSeconds();
+
 let remain=60-sec;
 
 let h=now.getUTCHours();
+
 let m=now.getUTCMinutes();
 
 let total=h*60+m;
 
 let date=new Intl.DateTimeFormat(
+
 'en-GB',
+
 {year:'numeric',month:'2-digit',day:'2-digit',timeZone:'UTC'}
+
 ).format(now).replace(/\//g,'');
 
 let period="1000"+(10001+total);
 
 document.getElementById("period").innerText=date+period;
+
 document.getElementById("timer").innerText=remain;
 
 },1000);
 
 }
 
-/* PATTERN MATCH */
+/* SIMILARITY */
 
 function similarity(a,b){
 
 let match=0;
 
 for(let i=0;i<a.length;i++){
-if(a[i]==b[i])match++;
+
+if(a[i]==b[i]) match++;
+
 }
 
 return match/a.length;
@@ -248,18 +330,25 @@ matches.push(results[i+6]);
 if(matches.length==0){
 
 return{
+
 pred:results[results.length-1]=="B"?"S":"B",
+
 pattern:present.join("")
+
 }
 
 }
 
 let b=matches.filter(x=>x=="B").length;
+
 let s=matches.length-b;
 
 return{
+
 pred:b>s?"B":"S",
+
 pattern:present.join("")
+
 }
 
 }
@@ -269,6 +358,7 @@ pattern:present.join("")
 async function update(){
 
 let r=await fetch(API);
+
 let j=await r.json();
 
 let list=j.data.list;
@@ -299,21 +389,23 @@ let actual=num>=5?"BIG":"SMALL";
 
 let win=savedPrediction==actual;
 
-let row=`
-<tr>
+let row=
+
+`<tr>
 <td>${period.slice(-4)}</td>
 <td>${savedPrediction}</td>
 <td>${num}</td>
 <td class="${win?'win':'loss'}">${win?'WIN':'LOSS'}</td>
-</tr>
-`;
+</tr>`;
 
 document.getElementById("history").innerHTML=
+
 row+document.getElementById("history").innerHTML;
 
 }
 
 savedPrediction=pred;
+
 lastPeriod=period;
 
 }
