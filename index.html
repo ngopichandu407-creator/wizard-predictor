@@ -2,52 +2,172 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pattern System FINAL</title>
+<title>EVIL DAD AI</title>
 
 <style>
-body{margin:0;background:#0f111a;color:#fff;font-family:Arial}
-.app{max-width:460px;margin:auto;padding:15px}
-.card{background:#161925;padding:15px;border-radius:12px;margin-bottom:12px}
-.center{text-align:center}
-.pred{font-size:40px;font-weight:bold}
-.BIG{color:#ff5555}
-.SMALL{color:#50fa7b}
-table{width:100%;font-size:12px;border-collapse:collapse}
-th,td{padding:6px;text-align:center}
-.win{color:#50fa7b;font-weight:bold}
-.loss{color:#ff5555;font-weight:bold}
-.status{font-size:12px;color:#9aa0b4}
+
+body{
+margin:0;
+font-family:Arial;
+background:linear-gradient(180deg,#05060c,#0f1220);
+color:white;
+display:flex;
+justify-content:center;
+}
+
+.app{
+width:420px;
+padding:20px;
+}
+
+/* TITLE */
+
+.title{
+text-align:center;
+font-size:24px;
+font-weight:900;
+letter-spacing:3px;
+margin-bottom:18px;
+color:#ff2e63;
+text-shadow:0 0 10px #ff2e63;
+}
+
+/* BOX */
+
+.box{
+background:#121526;
+border-radius:16px;
+padding:16px;
+margin-bottom:14px;
+border:1px solid #2b3050;
+box-shadow:0 0 15px rgba(0,0,0,0.5);
+}
+
+/* TOP BAR */
+
+.topbar{
+display:flex;
+justify-content:space-between;
+font-size:13px;
+font-weight:bold;
+color:#9aa2d6;
+}
+
+/* PREDICTION */
+
+.predictionBox{
+text-align:center;
+}
+
+#prediction{
+font-size:48px;
+font-weight:900;
+margin-top:10px;
+letter-spacing:2px;
+}
+
+.big{
+color:#ff3b3b;
+text-shadow:0 0 10px #ff3b3b;
+}
+
+.small{
+color:#00ff9d;
+text-shadow:0 0 10px #00ff9d;
+}
+
+.pattern{
+font-size:12px;
+margin-top:8px;
+color:#9aa2d6;
+}
+
+/* HISTORY */
+
+.history{
+max-height:260px;
+overflow-y:auto;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+font-size:12px;
+}
+
+th{
+color:#8d94c5;
+padding:6px;
+}
+
+td{
+padding:6px;
+}
+
+.win{
+color:#00ff9d;
+font-weight:bold;
+}
+
+.loss{
+color:#ff3b3b;
+font-weight:bold;
+}
+
+/* SCROLL */
+
+.history::-webkit-scrollbar{
+width:4px;
+}
+
+.history::-webkit-scrollbar-thumb{
+background:#444;
+border-radius:10px;
+}
+
 </style>
 </head>
+
 <body>
 
 <div class="app">
 
-<div class="card center">
-<h2>PRO PATTERN MATCH</h2>
-<div id="timer">--</div>
+<div class="title">EVIL DAD</div>
+
+<div class="box topbar">
+<div>Period: <span id="period">---</span></div>
+<div>Timer: <span id="timer">--</span></div>
 </div>
 
-<div class="card center">
-<div>NEXT PREDICTION</div>
-<div id="prediction" class="pred">LOADING</div>
-<div id="status" class="status">Connecting...</div>
+<div class="box predictionBox">
+
+<div style="font-size:12px;color:#9aa2d6">NEXT OUTCOME</div>
+
+<div id="prediction">WAIT</div>
+
+<div class="pattern">
+Pattern Used : <span id="pattern">---</span>
 </div>
 
-<div class="card">
-<h3>WIN / LOSS TRACKER</h3>
+</div>
+
+<div class="box history">
+
 <table>
+
 <thead>
 <tr>
-<th>Period</th>
-<th>Pred</th>
-<th>Actual</th>
-<th>Result</th>
+<th>PERIOD</th>
+<th>PRED</th>
+<th>NUM</th>
+<th>RESULT</th>
 </tr>
 </thead>
+
 <tbody id="history"></tbody>
+
 </table>
+
 </div>
 
 </div>
@@ -56,100 +176,151 @@ th,td{padding:6px;text-align:center}
 
 const API="https://draw.ar-lottery01.com/WinGo/WinGo_1M/GetHistoryIssuePage.json";
 
-let lastResolvedPeriod=null;
-let currentPrediction=null;
+let savedPrediction=null;
+let lastPeriod=null;
 
 /* TIMER */
+
+function startTimer(){
+
 setInterval(()=>{
-  const sec=new Date().getUTCSeconds();
-  document.getElementById("timer").innerText=(60-sec)+"s";
+
+let now=new Date();
+
+let sec=now.getUTCSeconds();
+let remain=60-sec;
+
+let h=now.getUTCHours();
+let m=now.getUTCMinutes();
+
+let total=h*60+m;
+
+let date=new Intl.DateTimeFormat(
+'en-GB',
+{year:'numeric',month:'2-digit',day:'2-digit',timeZone:'UTC'}
+).format(now).replace(/\//g,'');
+
+let period="1000"+(10001+total);
+
+document.getElementById("period").innerText=date+period;
+document.getElementById("timer").innerText=remain;
+
 },1000);
 
-
-/* PATTERN CALCULATION */
-function getPrediction(results){
-
-  const active=results.slice(-6);
-  let big=0,small=0,total=0;
-
-  for(let i=0;i<results.length-6;i++){
-    let match=0;
-    for(let j=0;j<6;j++){
-      if(results[i+j]===active[j]) match++;
-    }
-
-    if(match>=5){ // 90%
-      total++;
-      if(results[i+6]==="BIG") big++;
-      else small++;
-    }
-  }
-
-  if(total>=3){
-    return big>=small?"BIG":"SMALL";
-  }
-
-  // fallback majority last 20
-  const last20=results.slice(-20);
-  const bigCount=last20.filter(x=>x==="BIG").length;
-  const smallCount=last20.length-bigCount;
-
-  return bigCount>=smallCount?"BIG":"SMALL";
 }
 
+/* PATTERN MATCH */
 
-/* MAIN UPDATE */
+function similarity(a,b){
+
+let match=0;
+
+for(let i=0;i<a.length;i++){
+if(a[i]==b[i])match++;
+}
+
+return match/a.length;
+
+}
+
+/* PREDICT */
+
+function predict(results){
+
+let present=results.slice(-6);
+
+let matches=[];
+
+for(let i=0;i<results.length-7;i++){
+
+let past=results.slice(i,i+6);
+
+let sim=similarity(present,past);
+
+if(sim>=0.7){
+
+matches.push(results[i+6]);
+
+}
+
+}
+
+if(matches.length==0){
+
+return{
+pred:results[results.length-1]=="B"?"S":"B",
+pattern:present.join("")
+}
+
+}
+
+let b=matches.filter(x=>x=="B").length;
+let s=matches.length-b;
+
+return{
+pred:b>s?"B":"S",
+pattern:present.join("")
+}
+
+}
+
+/* UPDATE */
+
 async function update(){
 
-  try{
+let r=await fetch(API);
+let j=await r.json();
 
-    const response=await fetch(API,{cache:"no-store"});
-    if(!response.ok) throw new Error("Server");
+let list=j.data.list;
 
-    const data=await response.json();
-    if(!data.data || !data.data.list) throw new Error("NoData");
+let nums=list.map(x=>parseInt(x.number)).reverse();
 
-    const list=data.data.list.slice(0,500);
+let bs=nums.map(n=>n>=5?"B":"S");
 
-    const nums=list.map(x=>parseInt(x.number)).reverse();
-    const results=nums.map(n=>n>=5?"BIG":"SMALL");
+let p=predict(bs);
 
-    const prediction=getPrediction(results);
+let pred=p.pred=="B"?"BIG":"SMALL";
 
-    document.getElementById("prediction").innerText=prediction;
-    document.getElementById("prediction").className="pred "+prediction;
-    document.getElementById("status").innerText="LIVE ✔";
+let el=document.getElementById("prediction");
 
-    const latest=list[0];
-    const latestPeriod=latest.issueNumber;
+el.innerText=pred;
 
-    if(latestPeriod!==lastResolvedPeriod){
+el.className=p.pred=="B"?"big":"small";
 
-      const actual=parseInt(latest.number)>=5?"BIG":"SMALL";
-      const win=prediction===actual;
+document.getElementById("pattern").innerText=p.pattern;
 
-      const row=`
-      <tr>
-      <td>${latestPeriod.slice(-4)}</td>
-      <td>${prediction}</td>
-      <td>${actual}</td>
-      <td class="${win?'win':'loss'}">${win?'WIN':'LOSS'}</td>
-      </tr>`;
+let period=list[0].issueNumber;
 
-      document.getElementById("history").innerHTML=
-      row+document.getElementById("history").innerHTML;
+if(lastPeriod && lastPeriod!=period){
 
-      lastResolvedPeriod=latestPeriod;
-    }
+let num=nums[nums.length-1];
 
-  }catch(e){
-    document.getElementById("status").innerText="SERVER BLOCK / API ISSUE";
-  }
+let actual=num>=5?"BIG":"SMALL";
+
+let win=savedPrediction==actual;
+
+let row=`
+<tr>
+<td>${period.slice(-4)}</td>
+<td>${savedPrediction}</td>
+<td>${num}</td>
+<td class="${win?'win':'loss'}">${win?'WIN':'LOSS'}</td>
+</tr>
+`;
+
+document.getElementById("history").innerHTML=
+row+document.getElementById("history").innerHTML;
 
 }
 
-setInterval(update,4000);
-update();
+savedPrediction=pred;
+lastPeriod=period;
+
+}
+
+startTimer();
+
+setInterval(update,5000);
 
 </script>
 
