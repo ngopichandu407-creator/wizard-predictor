@@ -1,420 +1,186 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>EVIL DAD</title>
-
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<style>
-
-*{
-box-sizing:border-box;
-}
-
-body{
-
-margin:0;
-font-family:Arial;
-background:#070912;
-color:white;
-
-display:flex;
-justify-content:center;
-
-}
-
-.app{
-
-width:100%;
-max-width:420px;
-padding:14px;
-
-}
-
-/* TITLE */
-
-.title{
-
-text-align:center;
-font-size:24px;
-font-weight:900;
-letter-spacing:3px;
-margin-bottom:12px;
-
-color:#ff2e63;
-text-shadow:0 0 10px #ff2e63;
-
-}
-
-/* BOX */
-
-.box{
-
-background:#121526;
-
-border-radius:14px;
-
-padding:14px;
-
-margin-bottom:12px;
-
-border:1px solid #2c3150;
-
-}
-
-/* TOP BAR */
-
-.topbar{
-
-display:flex;
-
-justify-content:space-between;
-
-font-size:13px;
-
-color:#9aa2d6;
-
-}
-
-/* PREDICTION */
-
-.prediction{
-
-text-align:center;
-
-}
-
-#prediction{
-
-font-size:44px;
-
-font-weight:900;
-
-margin-top:6px;
-
-}
-
-.big{
-
-color:#ff4d4d;
-
-text-shadow:0 0 8px #ff4d4d;
-
-}
-
-.small{
-
-color:#00ffa2;
-
-text-shadow:0 0 8px #00ffa2;
-
-}
-
-.pattern{
-
-font-size:12px;
-
-margin-top:6px;
-
-color:#8a90c2;
-
-}
-
-/* HISTORY */
-
-.history{
-
-height:240px;
-
-overflow-y:auto;
-
-}
-
-table{
-
-width:100%;
-
-border-collapse:collapse;
-
-font-size:12px;
-
-}
-
-th{
-
-color:#8b92c7;
-
-padding:6px;
-
-}
-
-td{
-
-padding:6px;
-
-text-align:center;
-
-}
-
-.win{
-
-color:#00ffa2;
-
-font-weight:bold;
-
-}
-
-.loss{
-
-color:#ff4d4d;
-
-font-weight:bold;
-
-}
-
-/* SCROLL */
-
-.history::-webkit-scrollbar{
-
-width:4px;
-
-}
-
-.history::-webkit-scrollbar-thumb{
-
-background:#444;
-
-border-radius:10px;
-
-}
-
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The evil woner</title>
+    <style>
+        :root { --green: #00ff41; --red: #ff003c; --gold: #ffea00; --bg: #050505; --blue: #2d44c5; }
+        body { margin: 0; background: var(--bg); color: #fff; font-family: 'Segoe UI', sans-serif; overflow-x: hidden; }
+
+        /* Modern Login UI */
+        #loginScreen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle, #1a1a1a 0%, #050505 100%);
+            display: flex; align-items: center; justify-content: center; z-index: 1000;
+        }
+        .login-box {
+            background: rgba(15, 15, 15, 0.95); padding: 40px 30px; border-radius: 25px; 
+            box-shadow: 0 0 40px rgba(45, 68, 197, 0.3); text-align: center; width: 85%; max-width: 380px;
+            border: 1px solid #222; backdrop-filter: blur(10px);
+        }
+        .login-box h2 { color: var(--gold); margin-bottom: 10px; letter-spacing: 3px; font-size: 28px; text-shadow: 0 0 10px rgba(255, 234, 0, 0.3); }
+        .login-box p { color: #888; font-size: 14px; margin-bottom: 25px; }
+        
+        .login-box input {
+            width: 100%; padding: 15px; margin-bottom: 10px; border-radius: 15px;
+            border: 1px solid #333; background: #111; color: #fff; text-align: center; font-size: 18px;
+            transition: 0.3s; outline: none; box-sizing: border-box;
+        }
+        .login-box input:focus { border-color: var(--blue); box-shadow: 0 0 15px rgba(45, 68, 197, 0.4); }
+
+        #errorMsg { color: var(--red); font-size: 14px; margin-bottom: 15px; height: 18px; font-weight: bold; }
+
+        .login-btn {
+            width: 100%; padding: 15px; background: linear-gradient(90deg, #2d44c5, #1a2a8c); color: white;
+            border: none; border-radius: 15px; font-weight: 900; cursor: pointer; font-size: 16px;
+            text-transform: uppercase; letter-spacing: 1px; transition: 0.3s;
+        }
+        .login-btn:active { transform: scale(0.98); }
+
+        .contact-btn {
+            display: inline-block; margin-top: 25px; color: var(--gold); text-decoration: none; 
+            font-weight: bold; font-size: 14px; border: 1px solid var(--gold); padding: 10px 20px;
+            border-radius: 10px; transition: 0.3s;
+        }
+        .contact-btn:hover { background: var(--gold); color: #000; }
+
+        /* Original App UI (Hidden by default) */
+        #mainContent { display: none; }
+        .header{ background:#2d44c5; text-align:center; padding:15px; font-weight:900; letter-spacing:2px; }
+        .card{ max-width:420px; margin:20px auto; padding:22px; border-radius:22px; background:#0b0b0b; box-shadow:0 0 30px #000; }
+        .title{ text-align:center; color:var(--gold); font-weight:900; letter-spacing:3px; }
+        .line{ height:3px; background:var(--green); margin:10px 0 18px; }
+        .timer{ text-align:center; font-size:38px; }
+        .period{ text-align:center; font-size:12px; color:#aaa; }
+        .size{ text-align:center; font-size:50px; font-weight:900; margin:18px 0; }
+        .size.small{ color:var(--red); }
+        .size.big{ color:var(--green); }
+        .pred-box{ border:2px dashed #444; border-radius:16px; padding:18px; text-align:center; }
+        .pred-title{ color:var(--gold); font-weight:700; margin-bottom:10px; }
+        .circle{ width:90px; height:90px; margin:0 auto; border-radius:50%; border:6px solid var(--gold); display:flex; align-items:center; justify-content:center; font-size:42px; font-weight:900; }
+        table{ width:100%; margin-top:18px; font-size:12px; border-collapse:collapse; }
+        th,td{ padding:8px; border-bottom:1px solid #111; text-align:center; }
+        .win{ color:var(--green); font-weight:900; }
+        .loss{ color:var(--red); font-weight:900; }
+        .jackpot{ color:var(--gold); font-weight:900; }
+        .admin{ margin-top:22px; }
+        .admin h3{ text-align:center; color:var(--gold); }
+        .btn{ margin-top:10px; width:100%; padding:14px; background:var(--gold); border:none; border-radius:14px; font-weight:900; color: #000; cursor: pointer; }
+    </style>
 </head>
-
 <body>
 
-<div class="app">
-
-<div class="title">EVIL DAD</div>
-
-<div class="box topbar">
-
-<div>Period : <span id="period">---</span></div>
-
-<div>Timer : <span id="timer">--</span></div>
-
+<div id="loginScreen">
+    <div class="login-box">
+        <h2>EVIL MODZZ</h2>
+        <p>Premium Predictor Access</p>
+        <input type="text" id="passKey" placeholder="Enter Activation Key">
+        <div id="errorMsg"></div>
+        <button class="login-btn" onclick="checkPass()">Login Now</button>
+        <a href="FUCK OF YOU"class="contact-btn">CONTACT FOR KEY</a>
+    </div>
 </div>
 
-<div class="box prediction">
-
-<div style="font-size:12px;color:#9aa2d6">NEXT OUTCOME</div>
-
-<div id="prediction">WAIT</div>
-
-<div class="pattern">
-
-Pattern : <span id="pattern">---</span>
-
-</div>
-
-</div>
-
-<div class="box history">
-
-<table>
-
-<thead>
-
-<tr>
-
-<th>PERIOD</th>
-<th>PRED</th>
-<th>NUM</th>
-<th>RESULT</th>
-
-</tr>
-
-</thead>
-
-<tbody id="history"></tbody>
-
-</table>
-
-</div>
-
+<div id="mainContent">
+    <div class="header"> EVIL DAD FUCK</div>
+    <div class="card">
+      <div class="title">THE EVIL DAD FUCK</div></div>
+      <div class="line"></div>
+      <div class="timer" id="timer">01:00</div>
+      <div class="period" id="period">PERIOD: ---</div>
+      <div id="size" class="size">WAIT</div>
+      <div class="pred-box">
+        <div class="pred-title">PREDICTED NUMBER</div>
+        <div class="circle" id="predNum">-</div>
+      </div>
+      <table>
+        <thead>
+          <tr><th>PERIOD</th><th>PRED</th><th>RESULT</th><th>STATUS</th></tr>
+        </thead>
+        <tbody id="logs"></tbody>
+      </table>
+      <div class="admin">
+        <h3>ADMIN CONTROL EVIL FCK</h3>
+        <button class="btn">GENERATE & COPY KEY RDX FUCK</button>
+      </div>
+    </div>
 </div>
 
 <script>
-
-const API="https://draw.ar-lottery01.com/WinGo/WinGo_1M/GetHistoryIssuePage.json";
-
-let savedPrediction=null;
-
-let lastPeriod=null;
-
-/* TIMER */
-
-function startTimer(){
-
-setInterval(()=>{
-
-let now=new Date();
-
-let sec=now.getUTCSeconds();
-
-let remain=60-sec;
-
-let h=now.getUTCHours();
-
-let m=now.getUTCMinutes();
-
-let total=h*60+m;
-
-let date=new Intl.DateTimeFormat(
-
-'en-GB',
-
-{year:'numeric',month:'2-digit',day:'2-digit',timeZone:'UTC'}
-
-).format(now).replace(/\//g,'');
-
-let period="1000"+(10001+total);
-
-document.getElementById("period").innerText=date+period;
-
-document.getElementById("timer").innerText=remain;
-
-},1000);
-
-}
-
-/* SIMILARITY */
-
-function similarity(a,b){
-
-let match=0;
-
-for(let i=0;i<a.length;i++){
-
-if(a[i]==b[i]) match++;
-
-}
-
-return match/a.length;
-
-}
-
-/* PREDICT */
-
-function predict(results){
-
-let present=results.slice(-6);
-
-let matches=[];
-
-for(let i=0;i<results.length-7;i++){
-
-let past=results.slice(i,i+6);
-
-let sim=similarity(present,past);
-
-if(sim>=0.7){
-
-matches.push(results[i+6]);
-
-}
-
-}
-
-if(matches.length==0){
-
-return{
-
-pred:results[results.length-1]=="B"?"S":"B",
-
-pattern:present.join("")
-
-}
-
-}
-
-let b=matches.filter(x=>x=="B").length;
-
-let s=matches.length-b;
-
-return{
-
-pred:b>s?"B":"S",
-
-pattern:present.join("")
-
-}
-
-}
-
-/* UPDATE */
-
-async function update(){
-
-let r=await fetch(API);
-
-let j=await r.json();
-
-let list=j.data.list;
-
-let nums=list.map(x=>parseInt(x.number)).reverse();
-
-let bs=nums.map(n=>n>=5?"B":"S");
-
-let p=predict(bs);
-
-let pred=p.pred=="B"?"BIG":"SMALL";
-
-let el=document.getElementById("prediction");
-
-el.innerText=pred;
-
-el.className=p.pred=="B"?"big":"small";
-
-document.getElementById("pattern").innerText=p.pattern;
-
-let period=list[0].issueNumber;
-
-if(lastPeriod && lastPeriod!=period){
-
-let num=nums[nums.length-1];
-
-let actual=num>=5?"BIG":"SMALL";
-
-let win=savedPrediction==actual;
-
-let row=
-
-`<tr>
-<td>${period.slice(-4)}</td>
-<td>${savedPrediction}</td>
-<td>${num}</td>
-<td class="${win?'win':'loss'}">${win?'WIN':'LOSS'}</td>
-</tr>`;
-
-document.getElementById("history").innerHTML=
-
-row+document.getElementById("history").innerHTML;
-
-}
-
-savedPrediction=pred;
-
-lastPeriod=period;
-
-}
-
-startTimer();
-
-setInterval(update,5000);
-
+    // Modern Login Logic
+    function checkPass() {
+        const pass = document.getElementById('passKey').value;
+        const error = document.getElementById('errorMsg');
+        
+        if (pass === "EVIL PAPA 09") {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'block';
+            startApp(); 
+        } else {
+            error.innerText = "Invalid Key! Try Again.";
+            setTimeout(() => { error.innerText = ""; }, 3000);
+        }
+    }
+
+    // Your Original Script (Unchanged)
+    function startApp() {
+        const BIG=[5,6,7,8,9];
+        const SMALL=[0,1,2,3,4];
+        const WIN_EMOJI = ["😎","🔥","💚","✅","🟢","🏆","⚡","💥","👑","🚀"];
+        const LOSS_EMOJI = ["😢","❌","🔴","💔","😞","🥺","😵","🚫","😬","😓"];
+
+        let runningPeriod=null;
+        let prediction=null;
+        let predNumber=null;
+
+        setInterval(()=>{
+          const sec=new Date().getSeconds();
+          const remain=60-sec;
+          document.getElementById('timer').innerText="00:"+String(remain).padStart(2,"0");
+        },1000);
+
+        setInterval(async()=>{
+          try{
+            const res=await fetch("https://draw.ar-lottery01.com/WinGo/WinGo_1M/GetHistoryIssuePage.json");
+            const json=await res.json();
+            const last=json.data.list[0];
+            const currentIssue=BigInt(last.issueNumber)+1n;
+
+            if(currentIssue!==runningPeriod){
+              const trend=json.data.list.slice(0,3).map(x=>x.number>=5?"BIG":"SMALL");
+              prediction = trend.filter(x=>x==="BIG").length>=2 ? "BIG" : "SMALL";
+              const opp = prediction==="BIG"?SMALL:BIG;
+              predNumber = opp[Math.floor(Math.random()*5)];
+
+              if(runningPeriod){
+                const actualSize = last.number>=5?"BIG":"SMALL";
+                let status="LOSS";
+                let cls="loss";
+                if(actualSize===prediction){
+                  const e=WIN_EMOJI[Math.floor(Math.random()*WIN_EMOJI.length)];
+                  status="WIN "+e;
+                  cls="win";
+                }else{
+                  const e=LOSS_EMOJI[Math.floor(Math.random()*LOSS_EMOJI.length)];
+                  status="LOSS "+e;
+                  cls="loss";
+                }
+                if(last.number===predNumber){
+                  status="🎉 JACKPOT";
+                  cls="jackpot";
+                }
+                document.getElementById('logs').innerHTML=`<tr><td>${runningPeriod.toString().slice(-3)}</td><td>${prediction}</td><td>${last.number}</td><td class="${cls}">${status}</td></tr>`+document.getElementById('logs').innerHTML;
+              }
+              runningPeriod=currentIssue;
+            }
+            document.getElementById('period').innerText="PERIOD: "+runningPeriod;
+            document.getElementById('size').innerText=prediction;
+            document.getElementById('size').className="size "+prediction.toLowerCase();
+            document.getElementById('predNum').innerText=predNumber;
+          }catch(e){}
+        },3000);
+    }
 </script>
-
 </body>
 </html>
