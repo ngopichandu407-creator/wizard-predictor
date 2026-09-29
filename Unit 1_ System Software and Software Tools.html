@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Unit 1: System Software and Software Tools</title>
+<style>
+:root{--bg:#eef3ef;--side:#10302c;--sidei:#cfe6e0;--card:#fff;--ink:#12302b;--mute:#587069;--line:#d2ded8;--acc:#0b7a6b;--acc2:#dff1ec;--hi:#f5b942;--hi2:#fff4d9;--code:#0c211e;--codei:#c9f2e8;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b1614;--side:#08110f;--sidei:#a9c9c1;--card:#122320;--ink:#e2f0ec;--mute:#93b0a8;--line:#22403a;--acc:#4fd1b8;--acc2:#163530;--hi:#f5b942;--hi2:#2b2411;--code:#07100e;--codei:#c9f2e8}}
+:root[data-theme="dark"]{--bg:#0b1614;--side:#08110f;--sidei:#a9c9c1;--card:#122320;--ink:#e2f0ec;--mute:#93b0a8;--line:#22403a;--acc:#4fd1b8;--acc2:#163530;--hi:#f5b942;--hi2:#2b2411;--code:#07100e;--codei:#c9f2e8}
+*{box-sizing:border-box}
+
+body{margin:0;background:var(--bg);color:var(--ink);font:16.5px/1.65 "Avenir Next","Segoe UI",Helvetica,Arial,sans-serif}
+h1,h2,h3{font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;font-weight:700;line-height:1.2}
+.app{display:block}
+aside{background:var(--side);color:var(--sidei);padding:24px 16px;position:sticky;top:0;height:100vh;overflow-y:auto;align-self:start}
+aside h1{font-size:20px;color:#fff;margin:0 0 4px}
+aside p{margin:0 0 18px;font-size:13px;opacity:.75}
+main{padding:0 clamp(16px,4vw,48px) 60px;max-width:900px;width:100%;margin:0 auto}
+header{background:var(--side);color:#fff;padding:48px clamp(16px,4vw,48px) 36px;margin-bottom:36px}
+header div{max-width:900px;margin:0 auto}
+header h1{font-size:clamp(28px,6vw,44px);margin:0 0 8px}
+header p{margin:0;color:var(--sidei);max-width:60ch}
+.panel{display:block;margin-bottom:56px}
+h2{font-size:clamp(26px,4vw,34px);margin:0 0 4px}
+.lead{color:var(--mute);margin:0 0 22px}
+h3{font-size:22px;margin:34px 0 10px;scroll-margin-top:16px}
+h3 span{display:inline-block;background:var(--hi);color:#2b1f00;font:700 13px "Avenir Next","Segoe UI",sans-serif;padding:2px 9px;border-radius:6px;margin-right:8px;vertical-align:middle}
+p{margin:8px 0}
+ul{padding-left:22px;margin:8px 0}
+li{margin:4px 0}
+.card{background:var(--card);border:1px solid var(--line);border-top:4px solid var(--acc);border-radius:10px;padding:14px 18px;margin:12px 0}
+.def{background:var(--acc2);border-radius:10px;padding:14px 18px;margin:12px 0;border-left:5px solid var(--acc)}
+.note{background:var(--hi2);border-left:5px solid var(--hi);border-radius:10px;padding:12px 16px;margin:14px 0;font-size:15px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
+.grid .card{margin:0}
+.flow{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:16px 0}
+.chip{background:var(--card);border:2px solid var(--acc);border-radius:999px;padding:8px 16px;font-weight:600;font-size:14px;text-align:center}
+.chip small{display:block;font-weight:400;color:var(--mute)}
+.arr{color:var(--hi);font-weight:800;font-size:20px}
+.stack{display:flex;flex-direction:column;align-items:center;gap:2px;margin:14px 0}
+.stack .chip{width:min(320px,100%);border-radius:12px}
+.gap{font-size:13px;color:var(--mute);font-style:italic}
+.wide{overflow-x:auto;margin:12px 0;border-radius:10px;border:1px solid var(--line)}
+table{border-collapse:collapse;width:100%;min-width:520px;background:var(--card);font-size:15px}
+th,td{padding:9px 12px;text-align:left;border-bottom:1px solid var(--line)}
+th{background:var(--acc);color:#fff}
+tr:last-child td{border-bottom:0}
+pre{background:var(--code);color:var(--codei);border-radius:10px;padding:14px;overflow-x:auto;font:14px/1.55 Consolas,Menlo,monospace;margin:12px 0}
+code{font-family:Consolas,Menlo,monospace;font-size:.9em;background:var(--acc2);padding:1px 6px;border-radius:5px}
+pre code{background:none;padding:0}
+details{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 16px;margin:8px 0}
+summary{cursor:pointer;font-weight:700}
+
+</style>
+</head>
+<body>
+<header><div><h1>Unit 1: System Software and Software Tools</h1><p>Language processors, data structures and software tools. Study notes for revision.</p></div></header>
+<div class="app">
+<main>
+
+<div class="panel on" id="lp">
+<h2>1. Language Processors</h2><p class="lead">How source code becomes something a computer can run.</p>
+
+<h3 id="lp1"><span>1.1</span>Introduction</h3>
+<div class="def"><b>Language processor:</b> a system program that converts <b>source code</b> (human-readable) into <b>machine code</b> (computer-executable).</div>
+<ul><li>Without language processors, writing programs directly in 0s and 1s would be very difficult.</li><li>Its primary role: convert a high-level source program into a machine-code target program.</li></ul>
+<div class="flow" role="img" aria-label="Source program, language processor, target program">
+<div class="chip">Source program<small>high-level code</small></div><span class="arr">&rarr;</span>
+<div class="chip">Language processor<small>lexical analysis, syntax analysis, code generation</small></div><span class="arr">&rarr;</span>
+<div class="chip">Target program<small>machine code</small></div></div>
+<div class="grid">
+<div class="card"><b>Assembler</b><br>Assembly &rarr; machine code</div>
+<div class="card"><b>Compiler</b><br>High-level &rarr; machine code</div>
+<div class="card"><b>Interpreter</b><br>High-level &rarr; executes line by line</div>
+<div class="card"><b>Preprocessor</b><br>Handles macros and directives</div></div>
+
+<h3 id="lp2"><span>1.2</span>Language Processing Activities</h3>
+<p>Two major activities:</p>
+<div class="flow"><div class="chip">Program generation<small>automatic creation</small></div><span class="arr">&rarr;</span><div class="chip">Program execution<small>translation or interpretation</small></div></div>
+<div class="card"><b>(a) Program generation</b><ul>
+<li>Automatically creates a program from a high-level specification, like a tool that writes code from simple instructions.</li>
+<li><b>Advantage:</b> reduces the specification gap and improves reliability.</li>
+<li><b>Example:</b> a <i>screen generator</i> builds a form-handling program from the fields you specify (name, age, gender).</li></ul></div>
+<p><b>(b) Program execution: two models</b></p>
+<div class="wide"><table>
+<tr><th></th><th>Translation model</th><th>Interpretation model</th></tr>
+<tr><td><b>How</b></td><td>Whole source translated into object code first</td><td>Translated and executed line by line</td></tr>
+<tr><td><b>Object code</b></td><td>Created, saved, reusable</td><td>None created or saved</td></tr>
+<tr><td><b>Best for</b></td><td>Programs run many times</td><td>Rapid prototyping and debugging</td></tr>
+<tr><td><b>Flow</b></td><td>Source &rarr; Compiler &rarr; Object program &rarr; Execution</td><td>Source &rarr; Interpreter &rarr; Execution</td></tr>
+<tr><td><b>Example</b></td><td>C</td><td>Python</td></tr></table></div>
+
+<h3 id="lp3"><span>1.3</span>Fundamentals: Syntax and Semantics</h3>
+<div class="grid">
+<div class="card"><b>Syntax: the form</b><p>The grammar and structure: keywords and rules for writing statements. Breaking a rule gives a <i>syntax error</i>.</p></div>
+<div class="card"><b>Semantics: the meaning</b><p>What the syntax does. A program that runs but gives a wrong result has a <i>semantic error</i>.</p></div></div>
+<pre><code>if (condition) {
+    statement;
+}
+// Syntax: the shape above; statements end with ;
+// Semantics: execute the statement only if condition is true</code></pre>
+<p><b>Language gaps</b></p>
+<div class="stack" role="img" aria-label="Application domain, specification gap, programming language, execution gap, execution domain">
+<div class="chip">Application domain<small>problem level</small></div><span class="gap">specification gap</span>
+<div class="chip">Programming language<small>C, Java, Python</small></div><span class="gap">execution gap</span>
+<div class="chip">Execution domain<small>machine instructions</small></div></div>
+<p><b>Specification methods</b></p>
+<ul><li><b>Syntax:</b> often written in <b>BNF (Backus&ndash;Naur Form)</b>.</li><li><b>Semantics:</b> described with formal systems such as set theory and Boolean algebra.</li></ul>
+
+<h3 id="lp4"><span>1.4</span>Language Processor Development Tools</h3>
+<p>Building a compiler or assembler by hand is difficult, so special tools exist.</p>
+<div class="wide"><table>
+<tr><th>Tool</th><th>Purpose</th><th>Example</th></tr>
+<tr><td>Lexical analyzer generator</td><td>Builds scanners that identify tokens</td><td><b>Lex</b></td></tr>
+<tr><td>Parser generator</td><td>Builds parsers for syntax analysis</td><td><b>Yacc</b></td></tr>
+<tr><td>Code generator generator</td><td>Automates object code creation</td><td><b>LLVM tools</b></td></tr>
+<tr><td>Macro processor</td><td>Expands macros</td><td><b>C preprocessor</b></td></tr>
+<tr><td>Debugging tools</td><td>Help test and debug language processors</td><td><b>GDB</b></td></tr></table></div>
+<p><b>Example:</b> a C compiler can be built using Lex (tokenizing) and Yacc (parsing).</p>
+</div>
+
+<div class="panel" id="ds">
+<h2>2. Data Structures for Language Processing</h2><p class="lead">How a compiler stores information and memory.</p>
+<h3 id="ds1"><span>2.1</span>Search Data Structures</h3>
+<p>Store and quickly retrieve information about a program's elements.</p>
+<div class="wide"><table>
+<tr><th>Structure</th><th>What it is</th><th>Search speed</th></tr>
+<tr><td>Linear list</td><td>Simple list, easy to implement</td><td>Slow for large data</td></tr>
+<tr><td>Binary search tree</td><td>Hierarchical organisation of data</td><td>Much faster than a list</td></tr>
+<tr><td>Hash table</td><td>Hash function maps data to an array index</td><td>Almost instant</td></tr>
+<tr><td>Symbol table</td><td>Crucial compiler structure, typically a hash table, holding details of every identifier (variables, functions, labels): type, scope, memory location</td><td>Fast (hash-based)</td></tr></table></div>
+<div class="card"><b>Example:</b> for <code>int marks;</code> the compiler adds a symbol table entry:<ul><li>Name = marks</li><li>Type = int</li><li>Scope = local or global</li></ul></div>
+
+<h3 id="ds2"><span>2.2</span>Allocation Data Structures</h3>
+<p>Manage memory during translation and execution.</p>
+<div class="grid">
+<div class="card"><b>Static</b><ul><li>Assigned at <b>compile time</b></li><li>For fixed-size data such as global variables</li></ul><small><i>Analogy: a seat reserved in advance.</i></small></div>
+<div class="card"><b>Stack</b><ul><li><b>LIFO</b> (last in, first out)</li><li>For function calls and local variables</li><li>Frame pushed on call, popped on return</li></ul><small><i>Analogy: a stack of plates.</i></small></div>
+<div class="card"><b>Heap</b><ul><li>Allocated <b>at runtime</b></li><li>For data of unknown size</li><li>Programmer requests and releases it</li></ul><small><i>Analogy: an open playground.</i></small></div></div>
+<pre><code>int factorial(int n) {
+    if (n == 0) return 1;
+    else return n * factorial(n - 1);
+}
+// Each recursive call allocates a new stack frame.
+
+int *p = (int*) malloc(sizeof(int));   // heap allocation</code></pre>
+</div>
+
+<div class="panel" id="st">
+<h2>3. Software Tools</h2><p class="lead">What programmers use to write, translate, fix and run code.</p>
+<h3 id="st1"><span>3.1</span>Tools for Program Development</h3>
+<p>These tools make software development easier and faster.</p>
+<div class="wide"><table><tr><th>Editor</th><th>Compiler</th><th>Debugger</th><th>Output</th></tr><tr><td>VS Code</td><td>GCC 11.2</td><td>GDB 10.1</td><td>Program executed successfully</td></tr></table></div>
+<ul><li><b>Editors:</b> write code</li><li><b>Compilers and assemblers:</b> translate code</li><li><b>Debuggers:</b> fix errors</li><li><b>IDEs:</b> integrated development environments</li></ul>
+
+<h3 id="st2"><span>3.2</span>Editors</h3>
+<div class="grid">
+<div class="card"><b>Line editors</b><p>Old, command-based; edit a specific line by command. Example: <code>ed</code> in Unix.</p></div>
+<div class="card"><b>Screen editors</b><p>Modern, graphical; edit the whole file at once. Examples: VS Code, Notepad++. Offer syntax highlighting, auto-completion, error detection.</p></div></div>
+
+<h3 id="st3"><span>3.3</span>Debug Monitors</h3>
+<p>A debugger runs a program step by step to find logical errors (bugs).</p>
+<ul><li><b>Breakpoints:</b> pause at a chosen line</li><li><b>Watch variables:</b> check a value against what you expect</li><li><b>Memory inspection:</b> view the program's memory</li><li><b>Step-by-step execution:</b> one line at a time to trace the flow</li></ul>
+<p><b>Example:</b> GDB (GNU Debugger), a command-line debugger for C and C++.</p>
+
+<h3 id="st4"><span>3.4</span>Programming Environments (IDEs)</h3>
+<p>One application integrating the essential tools: source editor, build automation, debugger and more.</p>
+<div class="grid"><div class="card"><b>Turbo C++</b><br>C / C++</div><div class="card"><b>Eclipse</b><br>Java</div><div class="card"><b>PyCharm</b><br>Python</div></div>
+
+<h3 id="st5"><span>3.5</span>User Interfaces</h3>
+<p>The UI is how a user interacts with a program.</p>
+<div class="wide"><table>
+<tr><th>Type</th><th>Description</th><th>Examples</th></tr>
+<tr><td>CLI</td><td>Text-based, users type commands. Efficient for experts, harder for beginners</td><td>Linux shell, MS-DOS</td></tr>
+<tr><td>GUI</td><td>Icons, windows, menus, buttons. Intuitive for most people</td><td>Windows, macOS</td></tr>
+<tr><td>Touch</td><td>Controlled by touching the screen directly*</td><td>Mobiles, tablets</td></tr></table></div>
+<p>CLI: typing <code>gcc program.c -o program</code> in Linux. GUI: clicking Run in an IDE.</p>
+<div class="note">*Your original notes left the touch interface description blank. I added a one-line description; replace it with your teacher's wording if it differs.</div>
+</div>
+
+<div class="panel" id="rev">
+<h2>Quick Revision</h2><p class="lead">Tap a question to check yourself.</p>
+<details open><summary>Translation vs interpretation</summary><p>Translation converts everything first and saves reusable object code (C). Interpretation executes line by line with no object code (Python).</p></details>
+<details><summary>Syntax vs semantics</summary><p>Syntax is the form or grammar; semantics is the meaning. Broken syntax is a syntax error; wrong behaviour is a semantic error.</p></details>
+<details><summary>Specification gap vs execution gap</summary><p>Specification gap: application domain to programming language. Execution gap: programming language to machine instructions.</p></details>
+<details><summary>Static vs stack vs heap</summary><p>Static: compile time, fixed size. Stack: LIFO, function calls and locals. Heap: runtime, unknown size, programmer-managed.</p></details>
+<details><summary>Lex and Yacc</summary><p>Lex builds the scanner that finds tokens. Yacc builds the parser for syntax analysis.</p></details>
+<details><summary>Search structures, slowest to fastest</summary><p>Linear list, binary search tree, hash table. The symbol table is typically hash-based.</p></details>
+<details><summary>CLI vs GUI vs touch</summary><p>CLI: typed commands. GUI: windows and icons. Touch: direct screen input.</p></details>
+</div>
+
+</main>
+</div>
+</body>
+</html>
